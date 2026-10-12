@@ -1,0 +1,92 @@
+{
+  "iteration": 2,
+  "summary": "Re-validated app after English-localization spec change. Backend suite re-run (3 passed). 8 UI criteria each covered by a dedicated named browser check (all 8 passed). No bugs found.",
+  "passed": 11,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "English RSVP flow (API)",
+      "name": "test_tscheck_rsvp_guest_flow.py::test_rsvp_submit_happy_path",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/rsvps {guest_name:'tscheck-rsvp-<id>', guest_count:3} -> 201 with id; GET /api/admin/rsvps -> 200 contains created row with matching guest_name/guest_count"
+    },
+    {
+      "criterion": "English RSVP flow (API validation)",
+      "name": "test_tscheck_rsvp_guest_flow.py::test_rsvp_rejects_missing_guest_name",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/rsvps {guest_count:2} (missing guest_name) -> 422 validation error"
+    },
+    {
+      "criterion": "Editable English content (API)",
+      "name": "test_tscheck_admin_publish_roundtrip.py::test_admin_publish_roundtrip_updates_public_invitation",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "PUT /api/admin/invitation with modified basics.celebration_label (marker) -> 200; GET /api/invitation reflects marker; original value restored and verified via follow-up GET"
+    },
+    {
+      "criterion": "English opening screen",
+      "name": "opening-screen-english",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "At 390px opening-couple-names shows 'AKANKSHA WEDS VIVEK', opening-date shows exact 'Wednesday, 25 November 2026', open-invitation-button reads 'Open Invitation', opening-music-note reads 'Best experienced with music'; only Devanagari text on the opening screen is the Ganesh invocation '॥ श्री गणेशाय नमः ॥'"
+    },
+    {
+      "criterion": "English-only public invitation",
+      "name": "public-invitation-all-english",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "After opening the invitation (nav/hero/letter/couple/countdown/events/gallery/venues/children/hosts/rsvp/footer rendered), scanned full body innerText for Devanagari code points (\\u0900-\\u097F) — the only match found is the hero Ganesh invocation '॥ श्री गणेशाय नमः ॥'"
+    },
+    {
+      "criterion": "English family details",
+      "name": "family-details-english",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "bride-name='Aakanksha Kumari', groom-name='Vivek Kumar'; bride-detail-0 clean English; bride-address contains seeded 'Shantinagar', groom-address contains seeded 'Mokri'; bride-name bounding box non-zero width (not clipped)"
+    },
+    {
+      "criterion": "English events and venues",
+      "name": "events-and-venues-english",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "event-title-tilak-event/matkor/mandap are English (no Devanagari); first event title includes 'Tilak'; event-time-tilak-event shows '3:00 PM' while event-time-matkor element is absent (no time seeded); venue-name/address for home, hotel, tilak venues are all English"
+    },
+    {
+      "criterion": "English RSVP flow (UI)",
+      "name": "rsvp-english-flow",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "guest-name-label='Guest Name', guest-count-label='Number of Guests'; filled tscheck-rsvp-english-guest / 2, submitted via rsvp-submit-button; rsvp-success-message shows exact 'Thank you for celebrating this special moment with us!'"
+    },
+    {
+      "criterion": "Editable English content (UI)",
+      "name": "admin-celebration-label-english-roundtrip",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Admin Basics celebration-label-input set to tscheck-celebration-<ts> marker, Save & Publish; reload of public hero shows hero-celebration-label=marker; original 'Sacred Wedding Celebration' restored and re-verified on public hero"
+    },
+    {
+      "criterion": "Responsive mobile typography",
+      "name": "mobile-typography-no-overflow",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "At 390px viewport, document scrollWidth-clientWidth <= 2px on both opening and hero screens; bounding boxes of opening-couple-names and hero-couple-names fit fully within viewport width (no horizontal clipping)"
+    },
+    {
+      "criterion": "English opening date typography",
+      "name": "opening-date-title-case",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "opening-date innerText exactly 'Wednesday, 25 November 2026'; computed CSS text-transform is 'none' (not 'uppercase'/'capitalize'), preserving title case"
+    }
+  ],
+  "notes": [
+    "The opening-screen couple names are hardcoded in JSX as 'AKANKSHA WEDS VIVEK' (single-A spelling, not sourced from content.basics.bride_en which is 'AAKANKSHA'). This exactly matches the acceptance_matrix's literal expected text for the 'English opening screen' and 'Responsive mobile typography' criteria, so it is treated as expected/spec-matching behavior rather than a bug, though it is worth the main agent's awareness that the hero section (not checked here) and the opening screen may show differing spellings since opening text is hardcoded rather than data-driven.",
+    "Pruned 8 stale browser check artifacts from the prior Hindi-content iteration (opening-screen-audio-controls, hero-hindi-content-correctness, ist-countdown-target, events-and-venues-display, gallery-lightbox-and-no-overflow, rsvp-guest-submission-success, admin-publish-roundtrip, admin-core-controls-reachable) since the app content model changed from Hindi-first to English-first and the acceptance matrix was replaced; replaced with 8 checks matching the current matrix one-to-one."
+  ]
+}

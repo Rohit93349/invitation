@@ -1,0 +1,88 @@
+{
+  "iteration": 1,
+  "summary": "All 8 acceptance-matrix criteria exercised: 2 backend pytest files (3 tests, all passed) + 8 named browser checks (all passed). No bugs found.",
+  "passed": 10,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "RSVP guest flow (API)",
+      "name": "test_tscheck_rsvp_guest_flow.py::test_rsvp_submit_happy_path",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/rsvps {guest_name, guest_count:3} -> 201 with id; GET /api/admin/rsvps -> 200 contains created row with matching guest_name/guest_count"
+    },
+    {
+      "criterion": "RSVP guest flow (API validation)",
+      "name": "test_tscheck_rsvp_guest_flow.py::test_rsvp_rejects_missing_guest_name",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/rsvps {guest_count:2} (missing guest_name) -> 422 validation error"
+    },
+    {
+      "criterion": "Admin publish round-trip (API)",
+      "name": "test_tscheck_admin_publish_roundtrip.py::test_admin_publish_roundtrip_updates_public_invitation",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "PUT /api/admin/invitation with modified basics.celebration_label -> 200; GET /api/invitation reflects marker; original पावन विवाहोत्सव restored and verified via follow-up GET"
+    },
+    {
+      "criterion": "Opening experience and audio controls",
+      "name": "opening-screen-audio-controls",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "At 390px, opening-screen with opening-couple-names and open-invitation-button visible; tapping Open reveals hero-section, background-audio element attached, music-toggle-button visible; no thrown errors"
+    },
+    {
+      "criterion": "Hindi-first hero and invitation content",
+      "name": "hero-hindi-content-correctness",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "hero-couple-names contains आकांक्षा & विवेक; hero-shloka contains वक्रतुण्ड महाकाय...; hero-family-label contains सपरिवार; hero-celebration-label contains पावन विवाहोत्सव; hero-wedding-date contains 25/2026; invitation-letter-names contains आकांक्षा"
+    },
+    {
+      "criterion": "IST countdown",
+      "name": "ist-countdown-target",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "countdown-target text contains 25, 11, 2026, IST and 6:00 PM/18:00; countdown-values visible with numeric content"
+    },
+    {
+      "criterion": "Events and venues",
+      "name": "events-and-venues-display",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "events-timeline shows 5 events 21-25 Nov 2026 in order with Hindi weekdays (शनिवार..बुधवार); Tilak time '3:00 PM' and wedding time '6:00 PM' shown, other events show no time; all 3 venues (home/hotel/tilak) expose venue-directions-* links with non-empty href and visible venue-map-* iframes"
+    },
+    {
+      "criterion": "Gallery and responsive layout",
+      "name": "gallery-lightbox-and-no-overflow",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "engagement-gallery shows exactly 4 images; clicking one opens gallery-lightbox with lightbox-image, closable via lightbox-close-button; document.documentElement scrollWidth-clientWidth <= 2px at 390px viewport (no horizontal overflow)"
+    },
+    {
+      "criterion": "RSVP guest flow (UI)",
+      "name": "rsvp-guest-submission-success",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Filled guest-name-input/guest-count-input only, submitted via rsvp-submit-button; rsvp-success-message displayed exact text 'Thank you for celebrating this special moment with us!'"
+    },
+    {
+      "criterion": "Admin publish round-trip (UI)",
+      "name": "admin-publish-roundtrip",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "At /admin Basics tab, changed celebration-label-input to a tscheck marker, Save & Publish persisted it; reloaded public page shows hero-celebration-label with marker; restored original पावन विवाहोत्सव and re-verified on public page"
+    },
+    {
+      "criterion": "Core admin controls",
+      "name": "admin-core-controls-reachable",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "All 9 admin-tab-* buttons (basics/couple/events/venues/gallery/texts/music/theme/rsvp) reachable at 390px; music tab shows a playable track-preview-* <audio> element; export-backup-button and import-backup-button visible; rsvp-enabled-toggle interactive (toggled and reverted without publishing, seeded data untouched); rsvp-responses-table populated and rsvp-csv-export visible"
+    }
+  ]
+}

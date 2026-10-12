@@ -1,0 +1,115 @@
+{
+  "iteration": 3,
+  "summary": "Acceptance matrix replaced with 8 owner-admin-security criteria. Backend suite rewritten/extended (9 tests passed across 3 files). 5 named browser checks covering all UI-facing criteria (all passed). No credentials for the real Firebase owner password were provided (by design, per briefing); successful owner login was not attempted or reported as blocked. No bugs found.",
+  "passed": 14,
+  "failed": 0,
+  "bugs": [],
+  "action_items": [],
+  "retest_needed": false,
+  "checks": [
+    {
+      "criterion": "Guest admin read protection",
+      "name": "test_tscheck_admin_guest_protection.py::test_guest_cannot_read_rsvps",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/admin/rsvps (no cookie) -> 401 {\"detail\":\"Owner login required\"}"
+    },
+    {
+      "criterion": "Guest admin read protection",
+      "name": "test_tscheck_admin_guest_protection.py::test_guest_cannot_read_versions",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/admin/invitation/versions (no cookie) -> 401 {\"detail\":\"Owner login required\"}"
+    },
+    {
+      "criterion": "Guest admin read protection",
+      "name": "test_tscheck_admin_guest_protection.py::test_guest_cannot_read_rsvp_csv",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/admin/rsvps.csv (no cookie) -> 401 {\"detail\":\"Owner login required\"}"
+    },
+    {
+      "criterion": "Guest admin write protection",
+      "name": "test_tscheck_admin_guest_protection.py::test_guest_cannot_publish_invitation",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "PUT /api/admin/invitation with a tampered celebration_label_en (no cookie) -> 401; follow-up GET /api/invitation confirms original label unchanged, no write applied"
+    },
+    {
+      "criterion": "Guest admin write protection",
+      "name": "test_tscheck_admin_guest_protection.py::test_guest_cannot_restore_version",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/admin/invitation/restore {\"version_id\":\"tscheck-fake-id\"} (no cookie) -> 401 {\"detail\":\"Owner login required\"}"
+    },
+    {
+      "criterion": "Non-owner account rejection",
+      "name": "test_tscheck_auth_rejection.py::test_non_owner_login_rejected_generic",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/auth/login {email: tscheck-nonowner-<uuid>@example.com, password: 'whatever123'} -> 401; detail text does not mention account existence"
+    },
+    {
+      "criterion": "Non-owner account rejection",
+      "name": "non-owner-login-rejected",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "At /admin, filled owner-login-email-input='not-the-owner@example.com', owner-login-password-input, submitted; generic toast 'Incorrect owner email or password' shown; owner-login-page still visible, admin-page count=0 (no dashboard leaked)"
+    },
+    {
+      "criterion": "Clean signed-out state",
+      "name": "test_tscheck_auth_rejection.py::test_clean_signed_out_me",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "GET /api/auth/me (no cookie) -> 200 {\"email\":null,\"authenticated\":false}"
+    },
+    {
+      "criterion": "Guest admin page protection / Clean signed-out state (UI)",
+      "name": "guest-admin-login-only",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "At 390px, /admin without a session shows owner-login-page/card/email-input/password-input/submit-button; admin-page, admin-tabs, rsvp-responses-table, save-publish-button all have count 0; localStorage/sessionStorage scanned for token/session/auth-like keys, none found; no console errors"
+    },
+    {
+      "criterion": "Password reset access",
+      "name": "password-reset-ui-flow",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "owner-security-note text matches /not stored/i ('Your password is never stored by this website'); Forgot password reveals owner-reset-form with owner-reset-email-input and owner-reset-submit-button; Back to sign in returns to owner-login-form, owner-reset-form count=0"
+    },
+    {
+      "criterion": "Public guest flow remains available (API)",
+      "name": "test_tscheck_rsvp_guest_flow.py::test_rsvp_submit_happy_path_unauthenticated",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/rsvps {guest_name:'tscheck-rsvp-<id>', guest_count:3} with no cookie -> 201 with id; same unauthenticated client then GET /api/admin/rsvps -> 401 (guests get no visibility into other RSVPs)"
+    },
+    {
+      "criterion": "Public guest flow remains available (API validation)",
+      "name": "test_tscheck_rsvp_guest_flow.py::test_rsvp_rejects_missing_guest_name",
+      "lane": "backend",
+      "status": "passed",
+      "evidence": "POST /api/rsvps {guest_count:2} (missing guest_name) -> 422 validation error"
+    },
+    {
+      "criterion": "Public guest flow remains available (UI) + footer Owner link",
+      "name": "public-guest-flow-and-owner-link",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "Opened invitation, filled tscheck-guest-<ts>/2, submitted via rsvp-submit-button, rsvp-success-message shown; footer admin-link has href=/admin; clicking it navigates to /admin and lands on owner-login-page (admin-page count=0), not the dashboard"
+    },
+    {
+      "criterion": "Mobile security UI",
+      "name": "mobile-security-ui-no-overflow",
+      "lane": "browser",
+      "status": "passed",
+      "evidence": "At 390px, owner-login-card/email-input/password-input/submit-button/forgot-password-button all visible; document scrollWidth-clientWidth <= 2px; login card bounding box fully within viewport width (no clipping)"
+    }
+  ],
+  "notes": [
+    "No Firebase owner password was available to the testing agent (by design per briefing/spec_deviations), so a successful owner login was intentionally not attempted; 'Guest admin page protection' criterion is fully exercised from the only reachable state (no session).",
+    "Pruned 8 stale browser check artifacts from the prior English-localization iteration (opening-screen-english, public-invitation-all-english, family-details-english, events-and-venues-english, rsvp-english-flow, admin-celebration-label-english-roundtrip, mobile-typography-no-overflow, opening-date-title-case) since the acceptance matrix was fully replaced with owner-admin-security criteria; one of them (admin-celebration-label-english-roundtrip) would now fail on rerun because /admin publish correctly requires an owner session that does not exist in a fresh browser context, confirming the new protection is in effect.",
+    "Removed the now-obsolete test_tscheck_admin_publish_roundtrip.py backend test file (required owner auth that cannot be obtained in this environment) and rewrote test_tscheck_rsvp_guest_flow.py to assert the unauthenticated RSVP happy path without depending on the now-protected /api/admin/rsvps listing endpoint.",
+    "9/9 backend pytest tests passed; all 5 named browser checks passed; matrix has 8 criteria, fully covered across 14 checks[] entries (several criteria get both backend and browser artifacts, and 2 criteria share one guest-admin-login-only / test_tscheck_admin_guest_protection.py coverage point as noted in their criterion labels)."
+  ]
+}
